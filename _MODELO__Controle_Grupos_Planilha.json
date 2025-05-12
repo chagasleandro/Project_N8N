@@ -1,0 +1,635 @@
+{
+  "name": "[MODELO] Controle Grupos Planilha",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "314c998f-b757-4aa6-b41a-6e6787e21ad0",
+        "options": {}
+      },
+      "id": "30cca14a-0c66-4160-9188-24fabe296974",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -1500,
+        880
+      ],
+      "webhookId": "417418f6-4155-496b-be99-993480f48c29"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $node[\"Trata webhook\"].json[\"notification\"] }}",
+              "operation": "isNotEmpty"
+            }
+          ],
+          "boolean": [
+            {
+              "value1": "={{ $json.Comunidade }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "218f7565-e607-4a78-80e1-65ea49009ff4",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -840,
+        880
+      ]
+    },
+    {
+      "parameters": {
+        "value": "={{ $node[\"Trata webhook\"].json[\"momment\"]/1000 }}",
+        "custom": true,
+        "toFormat": "DD/MM/Y",
+        "options": {
+          "fromFormat": "x",
+          "toTimezone": "America/Sao_Paulo"
+        }
+      },
+      "id": "051db8dc-59b5-4597-85b7-46f4012b5d48",
+      "name": "Date & Time",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 1,
+      "position": [
+        -620,
+        860
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $node[\"Trata webhook\"].json[\"notification\"] }}",
+              "operation": "notEqual",
+              "value2": "GROUP_PARTICIPANT_LEAVE"
+            }
+          ]
+        }
+      },
+      "id": "8c137e39-e1fe-48c8-ac94-e978d3890d17",
+      "name": "IF1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        860
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return typeof $input.all()[0].json.body == 'string' ? JSON.parse($input.all()[0].json.body) : $input.all()[0].json.body"
+      },
+      "id": "d7c0f268-8ea0-4ed4-9075-28f0dbc0a6c7",
+      "name": "Trata webhook",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        -1280,
+        880
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "Data",
+              "value": "={{ $json[\"data\"] }}"
+            },
+            {
+              "name": "Telefone",
+              "value": "={{ $node[\"Trata webhook\"].json[\"notificationParameters\"][\"0\"] }}"
+            },
+            {
+              "name": "Group_ID",
+              "value": "={{ $node[\"Trata webhook\"].json[\"phone\"] }}"
+            },
+            {
+              "name": "Grupo",
+              "value": "={{ $node[\"Trata webhook\"].json[\"chatName\"] }}"
+            },
+            {
+              "name": "No Grupo?",
+              "value": "Sim"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fb19479c-c2a1-415a-9255-bae25187386e",
+      "name": "Entrou",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        -180,
+        760
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "Data",
+              "value": "={{ $json[\"data\"] }}"
+            },
+            {
+              "name": "Telefone",
+              "value": "={{ $node[\"Trata webhook\"].json[\"notificationParameters\"][\"0\"] }}"
+            },
+            {
+              "name": "Group_ID",
+              "value": "={{ $node[\"Trata webhook\"].json[\"phone\"] }}"
+            },
+            {
+              "name": "Grupo",
+              "value": "={{ $node[\"Trata webhook\"].json[\"chatName\"] }}"
+            },
+            {
+              "name": "No Grupo?",
+              "value": "Não"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2117b13c-cd34-478c-ae20-aa747fdb2cb0",
+      "name": "Saiu",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        -180,
+        960
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1HeLzkpnmvH9Kp-Mfp4lLa5vx5yAmH0i6IJ3GwvAvyfs/edit#gid=61832675",
+          "mode": "url",
+          "__regex": "https:\\/\\/(?:drive|docs)\\.google\\.com\\/\\w+\\/d\\/([0-9a-zA-Z\\-_]+)(?:\\/.*|)"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 61832675,
+          "mode": "list",
+          "cachedResultName": "Comunidades",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HeLzkpnmvH9Kp-Mfp4lLa5vx5yAmH0i6IJ3GwvAvyfs/edit#gid=61832675"
+        },
+        "columnToMatchOn": "Phone",
+        "valueToMatchOn": "={{ $node[\"Trata webhook\"].json[\"phone\"] }}",
+        "fieldsUi": {
+          "values": [
+            {
+              "column": "Participantes",
+              "fieldValue": "={{ parseInt($node[\"Read + ID\"].json[\"Participantes\"] == '' ? 0 : $node[\"Read + ID\"].json[\"Participantes\"]) +1 }}"
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "db9f5898-7357-4917-b495-b99d66a016df",
+      "name": "Adicionar 1 na Contagem",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        260,
+        760
+      ],
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "2",
+          "name": "Google Sheets Ozner"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1HeLzkpnmvH9Kp-Mfp4lLa5vx5yAmH0i6IJ3GwvAvyfs/edit#gid=61832675",
+          "mode": "url",
+          "__regex": "https:\\/\\/(?:drive|docs)\\.google\\.com\\/\\w+\\/d\\/([0-9a-zA-Z\\-_]+)(?:\\/.*|)"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 61832675,
+          "mode": "list",
+          "cachedResultName": "Comunidades",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HeLzkpnmvH9Kp-Mfp4lLa5vx5yAmH0i6IJ3GwvAvyfs/edit#gid=61832675"
+        },
+        "columnToMatchOn": "Phone",
+        "valueToMatchOn": "={{ $node[\"Trata webhook\"].json[\"phone\"] }}",
+        "fieldsUi": {
+          "values": [
+            {
+              "column": "Participantes",
+              "fieldValue": "={{ parseInt($node[\"Read - ID\"].json[\"Participantes\"] == '' ? 0 : $node[\"Read - ID\"].json[\"Participantes\"]) - 1 }}"
+            },
+            {
+              "column": "Saidas",
+              "fieldValue": "={{ parseInt($node[\"Read - ID\"].json[\"Saidas\"] == '' ? 0 : $node[\"Read - ID\"].json[\"Saidas\"]) + 1 }}"
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "e39b82ca-05c0-4dbb-b8f2-dc6292df1c1f",
+      "name": "Subtrair 1 na Contagem",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        260,
+        960
+      ],
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "2",
+          "name": "Google Sheets Ozner"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1HeLzkpnmvH9Kp-Mfp4lLa5vx5yAmH0i6IJ3GwvAvyfs/edit#gid=61832675",
+          "mode": "url",
+          "__regex": "https:\\/\\/(?:drive|docs)\\.google\\.com\\/\\w+\\/d\\/([0-9a-zA-Z\\-_]+)(?:\\/.*|)"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 61832675,
+          "mode": "list",
+          "cachedResultName": "Comunidades",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HeLzkpnmvH9Kp-Mfp4lLa5vx5yAmH0i6IJ3GwvAvyfs/edit#gid=61832675"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Phone",
+              "lookupValue": "={{ $node[\"Trata webhook\"].json[\"phone\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "891f48d0-09a9-46cd-9a55-643fcdc54bdb",
+      "name": "Read + ID",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        40,
+        760
+      ],
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "2",
+          "name": "Google Sheets Ozner"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1HeLzkpnmvH9Kp-Mfp4lLa5vx5yAmH0i6IJ3GwvAvyfs/edit#gid=61832675",
+          "mode": "url",
+          "__regex": "https:\\/\\/(?:drive|docs)\\.google\\.com\\/\\w+\\/d\\/([0-9a-zA-Z\\-_]+)(?:\\/.*|)"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 61832675,
+          "mode": "list",
+          "cachedResultName": "Comunidades",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HeLzkpnmvH9Kp-Mfp4lLa5vx5yAmH0i6IJ3GwvAvyfs/edit#gid=61832675"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Phone",
+              "lookupValue": "={{ $node[\"Trata webhook\"].json[\"phone\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "895d860e-b0b8-4e74-8e81-cc6209c374a2",
+      "name": "Read - ID",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        40,
+        960
+      ],
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "2",
+          "name": "Google Sheets Ozner"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let IDs = [\n\"120363163615904491-group\",\n\"120363162773481525-group\",\n\"120363161204343616-group\",\n\"120363161871492504-group\",\n\"120363146205605501-group\",\n\"120363161749413299-group\",\n\"120363162065451117-group\",\n\"120363142023829649-group\",\n\"120363143689551940-group\",\n\"120363143487977499-group\",\n\"120363143128007949-group\",\n\"120363142818387007-group\",\n\"120363144587052976-group\",\n\"120363162573402645-group\"]\n\n\nlet Comunidade = IDs.includes($node[\"Trata webhook\"].json[\"phone\"])\n\nreturn {Comunidade:Comunidade}"
+      },
+      "id": "3167f91d-3724-425a-a16c-1bc5e585aa80",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        -1060,
+        880
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1HeLzkpnmvH9Kp-Mfp4lLa5vx5yAmH0i6IJ3GwvAvyfs/edit#gid=61832675",
+          "mode": "url",
+          "__regex": "https:\\/\\/(?:drive|docs)\\.google\\.com\\/\\w+\\/d\\/([0-9a-zA-Z\\-_]+)(?:\\/.*|)"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1663299469,
+          "mode": "list",
+          "cachedResultName": "Participantes",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HeLzkpnmvH9Kp-Mfp4lLa5vx5yAmH0i6IJ3GwvAvyfs/edit#gid=1663299469"
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "Telefone",
+              "fieldValue": "={{ $node[\"Trata webhook\"].json[\"notificationParameters\"][\"0\"] }}"
+            },
+            {
+              "fieldId": "Data Entrada",
+              "fieldValue": "={{ $node[\"Date & Time\"].json[\"data\"] }}"
+            },
+            {
+              "fieldId": "Group_ID",
+              "fieldValue": "={{ $node[\"Trata webhook\"].json[\"phone\"] }}"
+            },
+            {
+              "fieldId": "Grupo",
+              "fieldValue": "={{ $node[\"Trata webhook\"].json[\"chatName\"] }}"
+            },
+            {
+              "fieldId": "No Grupo?",
+              "fieldValue": "Entrou"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d4958b59-3389-4afc-acc9-7d51929cd8b1",
+      "name": "Add nos Participantes",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        480,
+        760
+      ],
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "2",
+          "name": "Google Sheets Ozner"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1HeLzkpnmvH9Kp-Mfp4lLa5vx5yAmH0i6IJ3GwvAvyfs/edit#gid=61832675",
+          "mode": "url",
+          "__regex": "https:\\/\\/(?:drive|docs)\\.google\\.com\\/\\w+\\/d\\/([0-9a-zA-Z\\-_]+)(?:\\/.*|)"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1663299469,
+          "mode": "list",
+          "cachedResultName": "Participantes",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HeLzkpnmvH9Kp-Mfp4lLa5vx5yAmH0i6IJ3GwvAvyfs/edit#gid=1663299469"
+        },
+        "columnToMatchOn": "Telefone",
+        "valueToMatchOn": "={{ $node[\"Trata webhook\"].json[\"notificationParameters\"][\"0\"] }}",
+        "fieldsUi": {
+          "values": [
+            {
+              "column": "Data Saida",
+              "fieldValue": "={{ $node[\"Date & Time\"].json[\"data\"] }}"
+            },
+            {
+              "column": "No Grupo?",
+              "fieldValue": "Saiu"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "580b9178-1810-4cae-9a26-2225b046ce78",
+      "name": "Add nos Participantes1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [
+        480,
+        960
+      ],
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "2",
+          "name": "Google Sheets Ozner"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Trata webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "Date & Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time": {
+      "main": [
+        [
+          {
+            "node": "IF1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF1": {
+      "main": [
+        [
+          {
+            "node": "Entrou",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Saiu",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trata webhook": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Entrou": {
+      "main": [
+        [
+          {
+            "node": "Read + ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Saiu": {
+      "main": [
+        [
+          {
+            "node": "Read - ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read + ID": {
+      "main": [
+        [
+          {
+            "node": "Adicionar 1 na Contagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read - ID": {
+      "main": [
+        [
+          {
+            "node": "Subtrair 1 na Contagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adicionar 1 na Contagem": {
+      "main": [
+        [
+          {
+            "node": "Add nos Participantes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Subtrair 1 na Contagem": {
+      "main": [
+        [
+          {
+            "node": "Add nos Participantes1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "ef1e0427-d959-44a6-a07c-332cd4417885",
+  "id": "19",
+  "meta": {
+    "instanceId": "400b830bef8cbfbe6d2ce078088d74fa22fa10f93cef9ad55061d976ddfd92c0"
+  },
+  "tags": []
+}
