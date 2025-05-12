@@ -2,7 +2,7 @@
 # 🤖 Automação com n8n – Alertas de Incidentes e Pedidos via WhatsApp
 
 Este repositório contém dois fluxos criados com o [n8n](https://n8n.io/) para automatizar tarefas do dia a dia com foco em eficiência, integração e produtividade.
-![Tela do meu projeto](https://chatgpt.com/c/68226f06-a598-8000-a07a-faa00f7c4a7b)
+![Tela do meu projeto](![Image](https://github.com/user-attachments/assets/f20b9888-fd5d-4a53-8f5e-4f3d61af9887))
 
 
 ## 🚀 Funcionalidades
